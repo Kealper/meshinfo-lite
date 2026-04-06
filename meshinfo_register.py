@@ -35,13 +35,17 @@ class Register:
         return okay
 
     def add_user(self, username, email, password, code):
+        status = "CREATED"
+        if not code: # If no code was supplied, user is pre-verified
+            status = "VERIFIED"
         sql = """INSERT INTO meshuser
-(email, username, password, verification)
-VALUES (%s, %s, %s, %s)"""
+(email, username, password, status, verification)
+VALUES (%s, %s, %s, %s, %s)"""
         params = (
             email.lower(),
             username,
             password,
+            status,
             code
         )
         cur = self.db.cursor()
@@ -61,19 +65,25 @@ VALUES (%s, %s, %s, %s)"""
         elif not self.verify(username, password):
             return {"error": "Username or email already exist."}
         code = utils.generate_random_code(4)
+        email_auth = True
+        if not self.config["smtp"]["email"]:
+            email_auth = False
+            code = ""
         self.add_user(
            username,
            email.lower(),
            utils.hash_password(password),
            code
         )
+        if email_auth:
         base_url = self.config["mesh"]["url"]
-        utils.send_email(
-            email,
-            "MeshInfo Verify Account",
-            f"Please visit {base_url}/verify?c={code} to verify your account."
-        )
-        return {"success": "Please check your email to verify your account."}
+            utils.send_email(
+                email,
+                "MeshInfo Verify Account",
+                f"Please visit {base_url}/verify?c={code} to verify your account."
+            )
+            return {"success": "Please check your email to verify your account."}
+        return {"success": "You may now log in to your account."}
     
     def update_password(self, email, newpass):
         hashed = utils.hash_password(newpass)
