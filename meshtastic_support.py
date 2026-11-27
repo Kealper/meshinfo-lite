@@ -36,13 +36,13 @@ class HardwareModel(Enum):
     HELTEC_WIRELESS_BRIDGE = 24
     STATION_G1 = 25
     RAK11310 = 26
-    SENSELORA_RP2040 = 27
-    SENSELORA_S3 = 28
+    MAKERFABS_TRACKER = 27
+    MAKERFABS_RESERVED = 28
     CANARYONE = 29
     RP2040_LORA = 30
     STATION_G2 = 31
     LORA_RELAY_V1 = 32
-    NRF52840DK = 33
+    T_ECHO_PLUS = 33
     PPR = 34
     GENIEBLOCKS = 35
     NRF52_UNKNOWN = 36
@@ -102,7 +102,7 @@ class HardwareModel(Enum):
     THINKNODE_M2 = 90
     T_ETH_ELITE = 91
     HELTEC_SENSOR_HUB = 92
-    RESERVED_FRIED_CHICKEN = 93
+    MUZI_BASE = 93
     HELTEC_MESH_POCKET = 94
     SEEED_SOLAR_NODE = 95
     NOMADSTAR_METEOR_PRO = 96
@@ -110,11 +110,70 @@ class HardwareModel(Enum):
     LINK_32 = 98
     SEEED_WIO_TRACKER_L1 = 99
     SEEED_WIO_TRACKER_L1_EINK = 100
-    QWANTZ_TINY_ARMS = 101
+    MUZI_R1_NEO = 101
     T_DECK_PRO = 102
     T_LORA_PAGER = 103
-    GAT562_MESH_TRIAL_TRACKER = 104
+    M5STACK_RESERVED = 104
+    WISMESH_TAG = 105
+    RAK3312 = 106
+    THINKNODE_M5 = 107
+    HELTEC_MESH_SOLAR = 108
+    T_ECHO_LITE = 109
+    HELTEC_V4 = 110
+    M5STACK_C6L = 111
+    M5STACK_CARDPUTER_ADV = 112
+    HELTEC_WIRELESS_TRACKER_V2 = 113
+    T_WATCH_ULTRA = 114
+    THINKNODE_M3 = 115
+    WISMESH_TAP_V2 = 116
+    RAK3401 = 117
+    RAK6421 = 118
+    THINKNODE_M4 = 119
+    THINKNODE_M6 = 120
+    MESHSTICK_1262 = 121
+    TBEAM_1_WATT = 122
+    T5_S3_EPAPER_PRO = 123
+    TBEAM_BPF = 124
+    MINI_EPAPER_S3 = 125
+    TDISPLAY_S3_PRO = 126
+    HELTEC_MESH_NODE_T096 = 127
+    MESH_TRACKER_X1 = 128
+    THINKNODE_M7 = 129
+    THINKNODE_M8 = 130
+    THINKNODE_M9 = 131
+    HELTEC_V4_R8 = 132
+    HELTEC_MESH_NODE_T1 = 133
+    STATION_G3 = 134
+    T_IMPULSE_PLUS = 135
+    T_ECHO_CARD = 136
+    SEEED_WIO_TRACKER_L2 = 137
+    CROWPANEL_P4 = 138
+    HELTEC_MESH_TOWER_V2 = 139
+    MESHNOLOGY_W10 = 140
+    HELTEC_RC32 = 141
+    HELTEC_RC52 = 142
+    HELTEC_RCC6 = 143
+    SEEED_WIO_TRACKER_L1_PRO_1W = 144
+    MESHNOLOGY_W12 = 145
+    MESHPAGER_X2 = 146
+    T_CONNECT_PRO = 147
+    AXIOMETA_GENESIS_MINI = 148
+    MAKERFABS_NOMAD_TERMINAL = 149
+    THINKNODE_MX = 150
+    NODARA = 151
+    HELTEC_MESH_POCKET_V2 = 152
+    MESHNOLOGY_W15 = 153
+    M5STACK_SOLAR_NODE = 154
+    VIRTUAL_NODE = 254
     PRIVATE_HW = 255
+
+    # Deprecated model names retained as compatibility aliases for reused IDs.
+    SENSELORA_RP2040 = 27  # Now MAKERFABS_TRACKER
+    SENSELORA_S3 = 28  # Now MAKERFABS_RESERVED
+    NRF52840DK = 33  # Now T_ECHO_PLUS
+    RESERVED_FRIED_CHICKEN = 93  # Now MUZI_BASE
+    QWANTZ_TINY_ARMS = 101  # Now MUZI_R1_NEO
+    GAT562_MESH_TRIAL_TRACKER = 104  # Now M5STACK_RESERVED
 
     @classmethod
     def _missing_(cls, value):
@@ -190,13 +249,21 @@ class ModemPreset(Enum):
     """
     LONG_FAST = 0
     LONG_SLOW = 1
-    VERY_LONG_SLOW = 2  # Deprecated in 2.5: Works only with txco and is unusably slow
+    VERY_LONG_SLOW = 2  # Deprecated: Works only with a TCXO and is unusably slow
     MEDIUM_SLOW = 3
     MEDIUM_FAST = 4
     SHORT_SLOW = 5
     SHORT_FAST = 6
     LONG_MODERATE = 7
     SHORT_TURBO = 8  # Fastest preset with 500kHz bandwidth, not legal in all regions
+    LONG_TURBO = 9
+    LITE_FAST = 10
+    LITE_SLOW = 11
+    NARROW_FAST = 12
+    NARROW_SLOW = 13
+    TINY_FAST = 14
+    TINY_SLOW = 15
+    MEDIUM_TURBO = 16
 
 class RebroadcastMode(Enum):
     """
@@ -224,7 +291,7 @@ class BuzzerMode(Enum):
 class RoutingError(Enum):
     """
     Meshtastic routing error codes
-    from https://buf.build/meshtastic/protobufs/docs/main:meshtastic#meshtastic.RoutingError
+    from https://buf.build/meshtastic/protobufs/docs/main:meshtastic#meshtastic.Error
     """
     NONE = 0
     NO_ROUTE = 1
@@ -243,6 +310,7 @@ class RoutingError(Enum):
     ADMIN_BAD_SESSION_KEY = 36
     ADMIN_PUBLIC_KEY_UNAUTHORIZED = 37
     RATE_LIMIT_EXCEEDED = 38
+    PKI_SEND_FAIL_PUBLIC_KEY = 39
 
 def get_channel_name(channel_value, use_short_names=False):
     """
@@ -668,6 +736,17 @@ HARDWARE_PHOTOS = {
     ## HardwareModel.GAT562_MESH_TRIAL_TRACKER: "GAT562_MESH_TRIAL_TRACKER.webp",
 }
 
+# These IDs were reused upstream, so old device photos must not be shown.
+for _model in (
+    HardwareModel.MAKERFABS_TRACKER,
+    HardwareModel.MAKERFABS_RESERVED,
+    HardwareModel.T_ECHO_PLUS,
+    HardwareModel.MUZI_BASE,
+    HardwareModel.MUZI_R1_NEO,
+    HardwareModel.M5STACK_RESERVED,
+):
+    HARDWARE_PHOTOS.pop(_model, None)
+
 def validate_hardware_model(hw_model_value):
     """
     Strictly validate a hardware model value against the HardwareModel enum.
@@ -784,7 +863,8 @@ def get_routing_error_description(error_value):
         RoutingError.PKI_UNKNOWN_PUBKEY: "Destination has no encryption key available",
         RoutingError.ADMIN_BAD_SESSION_KEY: "Admin message uses invalid or expired session key",
         RoutingError.ADMIN_PUBLIC_KEY_UNAUTHORIZED: "Admin message from unauthorized sender",
-        RoutingError.RATE_LIMIT_EXCEEDED: "Message blocked by airtime fairness limits"
+        RoutingError.RATE_LIMIT_EXCEEDED: "Message blocked by airtime fairness limits",
+        RoutingError.PKI_SEND_FAIL_PUBLIC_KEY: "PKI encryption failed, due to no public key for the remote node",
     }
     
     try:
